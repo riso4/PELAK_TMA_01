@@ -1,17 +1,36 @@
 import { StatusBar } from 'expo-status-bar';
-import { Button } from 'react-native';
-import { StyleSheet, Text, View, TextInput } from 'react-native';
+import { v4 as uuidv } from 'uuid';
+import { useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import Item from './src/components/Item';
+import TaskInput from './src/components/TaskInput';
 
 export default function App() {
+  const [taskList, setTaskList] = useState([]);
+
+  function addTaskHandler() {
+    let id = "id" + Math.random().toString(16).slice(2);
+    setTaskList((currentTaskList) => [...currentTaskList, { id: id, title: inputText, done: false }]);
+  }
+
+
   return (
     <View style={styles.container}>
-      <View style={styles.inputContainer}>
-      <TextInput style={styles.input} placeholder="Zadaj úlohu... "/>
-      <Button title="ADD"/>
-      </View>
+      <TaskInput onAddTask={addTaskHandler} />
       <View style={styles.taskContainer}>
-      <Text>UDALOSTI...</Text>
-    </View>
+        {taskList.map((task) => (
+          <View style={styles.taskItem} key={task.id}>
+            <Text>
+              {task.id}: {task.title}
+            </Text>
+          </View>
+        ))}
+      </View>
+      <FlatList
+        data={taskList}
+        renderItem={({ item }) => <Item item={item} />}
+        keyExtractor={(item) => item.id}
+      />
 
       <StatusBar style="auto" />
     </View>
@@ -19,23 +38,22 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  inputContainer: {
-    flex: 1,
-    alignItems: 'center', 
-    justifyContent: 'space-between', 
-    flexDirection: 'row', 
-    paddingHorizontal: 12,
-    backgroundColor: '#753838',},
-
-  taskContainer: {flex: 4, borderTopWidth: 3, padding: 24, backgroundColor: '#6f79e7' },
 
   container: {
     flex: 1,
   },
-  
-  input: {
-    borderWidth: 3, 
-    borderColor: '#6f79e7', 
-    borderRadius: 8, 
-    width: '80%'},
+
+  taskContainer: {
+    flex: 4,
+    borderTopWidth: 3,
+    padding: 24,
+    backgroundColor: '#6f79e7'
+  },
+
+  taskItem: {
+    margin: 10,
+    padding: 5,
+    backgroundColor: 'orange',
+    borderRadius: 5,
+  },
 });
